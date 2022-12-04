@@ -56,7 +56,7 @@ class Hotel:
   and odd floor room with A series being nearest to entrance
   while on even floor room with E series being nearest to entrance 
   """
-  def __init__(self, no_of_flloors = 4, rooms_on_floor = 5) -> None:
+  def __init__(self, no_of_flloors,rooms_on_floor) -> None:
     self.__no_of_floors = no_of_flloors
     self.__rooms_on_floor = rooms_on_floor
     self.__hotel_rooms = []
