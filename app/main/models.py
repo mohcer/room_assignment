@@ -2,6 +2,7 @@
 Problem Domain: it holds all the models that represent the hotel room assignment problem primary entities
 """
 from enum import Enum
+from app.main.exceptions import *
 
 class RoomStatus(str, Enum):
     """
@@ -73,7 +74,10 @@ class Hotel:
         else:
           room_number = str(floor) + chr(a_ascii + room - 1)
 
-        self.__hotel_rooms.append(Room(room_number))  
+        self.__hotel_rooms.append(Room(room_number)) 
+
+    # initialize the available rooms list
+    self._fetch_only_available() 
   
   @property
   def no_of_floors(self) -> int:
@@ -91,23 +95,42 @@ class Hotel:
   def rooms_on_floor(self, rooms_on_floor):
     self.__rooms_on_floor = rooms_on_floor
 
+  @property
+  def total_rooms(self):
+    return self.no_of_floors * self.rooms_on_floor
+
   def _fetch_only_available(self):
     """
     :purpose: it only fetch those rooms whose status is currently available
     """
-    self.__available_rooms = filter(lambda room: room.status == RoomStatus.AVAILABLE, self.__hotel_rooms)
+    self.__available_rooms = list(filter(lambda room: room.room_status == RoomStatus.AVAILABLE, self.__hotel_rooms))
 
 
-  def _fetch_room_index(self, input_room: Room):
+  def _fetch_room_index(self, input_room_number: str):
     """
     :purpose: return the room index based on room number of the given room
     """
-    floor_no = input_room.room_number[0]
-    suffix = input_room.room_number[1]
+    floor_no = int(input_room_number[0])
+    suffix = input_room_number[1]
+
+    if floor_no == '-':
+      return -1
 
     indx_first_room = (floor_no - 1) * self.__rooms_on_floor
 
     return indx_first_room + (ord(suffix) - ord('A'))
+
+  def get_room(self, room_number: str) -> Room:
+    """
+    :purpose: for the given room_number fetches and returns the room object if found
+    else raises RoomNotFound exception if invalid room_number is provided
+    """
+    room_indx = self._fetch_room_index(room_number)
+
+    if room_indx >= 0 and room_indx <= self.total_rooms:
+      return self.__hotel_rooms[room_indx]
+    else:
+      raise RoomNotFound()
 
   def assign_room(self) -> str:
     """
@@ -119,7 +142,7 @@ class Hotel:
         avl_room = self.__available_rooms[0]
 
         # mark the room as allocated
-        indx_avl_room = self._fetch_room_index(avl_room) 
+        indx_avl_room = self._fetch_room_index(avl_room.room_number) 
 
         self.__hotel_rooms[indx_avl_room].room_status = RoomStatus.OCCUPIED
 
@@ -132,31 +155,41 @@ class Hotel:
     """
     :purpose: change room status as "vaccant" on check out room
     """
-    indx_room = self._fetch_room_index(room_to_checkout)
+    if room_to_checkout.room_status != RoomStatus.OCCUPIED:
+      raise InvalidRoomOperation()
 
-    if indx_room:
-      self.__hotel_rooms[indx_room].room_status = RoomStatus.VACCANT
+    room_indx = self._fetch_room_index(room_to_checkout.room_number)
+
+    self.__hotel_rooms[room_indx].room_status = RoomStatus.VACCANT
     
-    # TODO handle user exceptions
-    return True
-
-
 
   def clean_room(self, room_to_clean: Room) -> bool:
-    room_indx = self._fetch_room_index(room_to_clean)
+
+    if room_to_clean.room_status != RoomStatus.VACCANT:
+      if room_to_clean.room_status == RoomStatus.AVAILABLE:
+        raise RoomWillBeUsed()
+      else:
+        raise RoomInUse()
+    
+    room_indx = self._fetch_room_index(room_to_clean.room_number)
 
     self.__hotel_rooms[room_indx].room_status = RoomStatus.AVAILABLE
     
     # update the available room list
     self._fetch_only_available()
 
+
   def repair_room(self, room_to_repair: Room) -> bool:
-    room_indx = self._fetch_room_index(room_to_repair)
+    if room_to_repair.room_status != RoomStatus.VACCANT:
+      if room_to_repair.room_status == RoomStatus.AVAILABLE:
+        raise RoomWillBeUsed()
+      else:
+        raise RoomInUse()
+
+    room_indx = self._fetch_room_index(room_to_repair.room_number)
 
     self.__hotel_rooms[room_indx].room_status = RoomStatus.REPAIR
 
-    # TODO handle validation
-    return True
 
   def list_all_available_rooms(self) -> list:
     return self.__available_rooms
