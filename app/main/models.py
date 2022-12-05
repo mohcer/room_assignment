@@ -99,6 +99,9 @@ class Hotel:
   def total_rooms(self):
     return self.no_of_floors * self.rooms_on_floor
 
+  def get_all_hotel_rooms(self):
+    return self.__hotel_rooms
+    
   def _fetch_only_available(self):
     """
     :purpose: it only fetch those rooms whose status is currently available

@@ -25,6 +25,15 @@ class HotelService():
     def __init__(self, no_of_floors = 4, rooms_on_floor = 5) -> None:
         self.__hotel = Hotel(no_of_floors, rooms_on_floor)
 
+    def get_no_of_floors(self):
+        return self.__hotel.no_of_floors
+    
+    def get_rooms_on_floor(self):
+        return self.__hotel.rooms_on_floor
+    
+    def get_hotel(self):
+        return self.__hotel
+        
     def _validate_room_number(self, room_number):
 
         if len(room_number) != 2:
