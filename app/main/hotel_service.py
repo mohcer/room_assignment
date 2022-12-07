@@ -109,7 +109,7 @@ class HotelService():
         except InvalidRoomOperation as e:
             print(e)
         else:
-            print(f"Room {room_number} cleaned successfully!")
+            print(f"Room {room_number} is under repair now!")
 
     def get_all_list_of_available_rooms(self):
         avl_rooms = self.__hotel.list_all_available_rooms()
