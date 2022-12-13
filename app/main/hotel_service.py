@@ -89,6 +89,8 @@ class HotelService():
             print(e)
         except InvalidRoomOperation as e:
             print(e)
+        except RoomInUse as e:
+            print(e)
         else:
             print(f"Room {room_number} cleaned successfully!")
 
@@ -107,6 +109,8 @@ class HotelService():
         except RoomWillBeUsed as e:
             print(e)
         except InvalidRoomOperation as e:
+            print(e)
+        except RoomInUse as e:
             print(e)
         else:
             print(f"Room {room_number} is under repair now!")

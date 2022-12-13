@@ -121,7 +121,12 @@ class Hotel:
 
     indx_first_room = (floor_no - 1) * self.__rooms_on_floor
 
-    return indx_first_room + (ord(suffix) - ord('A'))
+    if floor_no % 2 == 0:
+      room_indx_on_floor = (ord('E') - ord(suffix))
+    else:
+      room_indx_on_floor = (ord(suffix) - ord('A'))
+
+    return indx_first_room + room_indx_on_floor 
 
   def get_room(self, room_number: str) -> Room:
     """
@@ -162,7 +167,7 @@ class Hotel:
       raise InvalidRoomOperation()
 
     room_indx = self._fetch_room_index(room_to_checkout.room_number)
-
+    
     self.__hotel_rooms[room_indx].room_status = RoomStatus.VACCANT
     
 
@@ -173,7 +178,7 @@ class Hotel:
         raise RoomWillBeUsed()
       else:
         raise RoomInUse()
-    
+
     room_indx = self._fetch_room_index(room_to_clean.room_number)
 
     self.__hotel_rooms[room_indx].room_status = RoomStatus.AVAILABLE
@@ -183,6 +188,7 @@ class Hotel:
 
 
   def repair_room(self, room_to_repair: Room) -> bool:
+    
     if room_to_repair.room_status != RoomStatus.VACCANT:
       if room_to_repair.room_status == RoomStatus.AVAILABLE:
         raise RoomWillBeUsed()
